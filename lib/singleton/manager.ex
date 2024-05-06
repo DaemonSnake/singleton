@@ -38,7 +38,17 @@ defmodule Singleton.Manager do
   @doc false
   def init([mod, args, name, on_conflict]) do
     state = %State{mod: mod, args: args, name: name, on_conflict: on_conflict}
-    {:ok, restart(state)}
+
+    try do
+      {:ok, restart(state)}
+    rescue
+      err ->
+        Logger.error(
+          "Failed to start singleton manager: #{inspect(err, pretty: true)}"
+        )
+
+        raise err
+    end
   end
 
   @doc false
