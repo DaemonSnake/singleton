@@ -47,8 +47,12 @@ defmodule Singleton.Manager do
     {:stop, :normal, state}
   end
 
-  def handle_info({:DOWN, _, :process, pid, _reason}, state = %State{pid: pid}) do
+  def handle_info({:DOWN, _, :process, pid, reason}, state = %State{pid: pid}) do
     # Managed process exited with an error. Try restarting, after a delay
+    Logger.error(
+      "Singleton process #{state.name} died: #{inspect(reason, pretty: true)}"
+    )
+
     Process.sleep(:rand.uniform(5_000) + 5_000)
     {:noreply, restart(state)}
   end
